@@ -17,6 +17,21 @@
     <!-- PWA用manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B4F92">
+    
+    <!-- Service Worker登録 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -646,7 +661,19 @@
             let deferredPrompt;
             const addToHomeBtn = document.getElementById('addToHomeBtn');
             
-            // ボタンのクリックイベント関数
+            // PWAインストールプロンプトイベントをキャッチ
+            window.addEventListener('beforeinstallprompt', function(e) {
+                // デフォルトのプロンプトを阻止
+                e.preventDefault();
+                // 後で使用するためにイベントを保存
+                deferredPrompt = e;
+                // ボタンを表示
+                if (addToHomeBtn) {
+                    addToHomeBtn.style.display = 'flex';
+                }
+            });
+            
+            // ボタンのクリックイベント
             function handleAddToHomeClick(e) {
                 e.preventDefault();
                 
@@ -655,38 +682,46 @@
                     deferredPrompt.prompt();
                     // ユーザーの選択を待つ
                     deferredPrompt.userChoice.then(function(result) {
-                        console.log('User response to the install prompt: ' + result.outcome);
-                        // プロンプトを使用済みにする
+                        console.log('User response: ' + result.outcome);
                         deferredPrompt = null;
+                        // インストール後はボタンを非表示
+                        if (addToHomeBtn) {
+                            addToHomeBtn.style.display = 'none';
+                        }
                     });
                 } else {
-                    // PWAインストールが利用できない場合の処理
+                    // PWAインストールプロンプトが利用できない場合は手動手順を表示
                     if (navigator.userAgent.match(/iPhone|iPad|iPod/)) {
-                        // iOS Safari の場合
                         alert('ホーム画面に追加するには：\n1. 共有ボタン（□↑）をタップ\n2. 「ホーム画面に追加」を選択してください');
                     } else if (navigator.userAgent.match(/Android/)) {
-                        // Android Chrome の場合
                         alert('ホーム画面に追加するには：\n1. メニュー（⋮）をタップ\n2. 「ホーム画面に追加」を選択してください');
                     } else {
-                        // その他のブラウザ
-                        alert('このブラウザではホーム画面への追加がサポートされていません。\nブラウザのブックマーク機能をご利用ください。');
+                        alert('このブラウザではPWAインストールがサポートされていません。');
                     }
                 }
             }
             
             // ボタンにイベントリスナーを追加
             if (addToHomeBtn) {
-                addToHomeBtn.style.display = 'flex';
+                // 初期状態では非表示（beforeinstallpromptイベントで表示）
+                addToHomeBtn.style.display = 'none';
                 addToHomeBtn.addEventListener('click', handleAddToHomeClick);
             }
             
-            // PWAインストールプロンプトイベントをキャッチ
-            window.addEventListener('beforeinstallprompt', function(e) {
-                // デフォルトのプロンプトを阻止
-                e.preventDefault();
-                // 後で使用するためにイベントを保存
-                deferredPrompt = e;
+            // アプリがインストールされた後の処理
+            window.addEventListener('appinstalled', function(evt) {
+                console.log('アプリがインストールされました');
+                if (addToHomeBtn) {
+                    addToHomeBtn.style.display = 'none';
+                }
             });
+            
+            // 既にスタンドアロンモードの場合はボタンを非表示
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                if (addToHomeBtn) {
+                    addToHomeBtn.style.display = 'none';
+                }
+            }
         });
         
         // 右クリック防止（画像保護）
