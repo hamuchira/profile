@@ -435,12 +435,23 @@
                     "></div>
                     <div class="project-info">
                         <h3>🎨 毛色シミュレーター</h3>
-                        <div class="color-simulator-preview protected-image">
-                            <img src="color-simulator.jpg" alt="ジャンガリアンハムスターの毛色一覧" style="max-width: 100%; height: auto; border-radius: 8px;">
-                            <p>ジャンガリアンハムスターの毛色パターンを詳しく解説</p>
-                        </div>
                         <p>ハムスターの遺伝と毛色について学べるシミュレーター。繁殖を考えている方におすすめです。</p>
-                        <a href="https://hamuchira.github.io/hamuchira/" class="project-link" target="_blank">シミュレーターを使う</a>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://hamuchira.github.io/hamuchira/" class="project-link" target="_blank" style="flex: 1; min-width: 120px; text-align: center;">シミュレーターを使う</a>
+                            <button id="colorModalBtn" style="
+                                flex: 1; min-width: 120px; text-align: center;
+                                background: linear-gradient(135deg, #ff9ec7, #8B4F92);
+                                color: white;
+                                border: none;
+                                border-radius: 50px;
+                                padding: 0.8rem 2rem;
+                                text-decoration: none;
+                                font-weight: 500;
+                                font-size: 1rem;
+                                cursor: pointer;
+                                transition: transform 0.3s ease;
+                            ">毛色一覧を見る</button>
+                        </div>
                     </div>
                 </div>
 
@@ -575,6 +586,79 @@
             el.style.transform = 'translateY(30px)';
             el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(el);
+        });
+        
+        // ページ読み込み完了後に実行
+        document.addEventListener('DOMContentLoaded', function() {
+            // モーダル機能
+            function openModal() {
+                const modal = document.getElementById('colorModal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    document.body.style.overflow = 'hidden'; // スクロール防止
+                }
+            }
+            
+            function closeModal() {
+                const modal = document.getElementById('colorModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // スクロール復元
+                }
+            }
+            
+            // プレビューエリアの代わりにボタンのクリックイベント
+            const colorModalBtn = document.getElementById('colorModalBtn');
+            if (colorModalBtn) {
+                colorModalBtn.addEventListener('click', openModal);
+                
+                // ホバー効果
+                colorModalBtn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                colorModalBtn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            }
+            
+            // 閉じるボタンのクリックイベント
+            const closeBtn = document.querySelector('.modal-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
+            
+            // モーダル外クリックで閉じる
+            const modal = document.getElementById('colorModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+            }
+            
+            // ESCキーで閉じる
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+            
+            // 右クリック防止（モーダル画像）
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.classList.contains('modal-image')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // ドラッグ防止（モーダル画像）
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.classList.contains('modal-image')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
         });
         
         // ホーム画面追加機能
