@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>はむチラ - ハムスターの可愛い世界</title>
+    
+    <!-- ファビコン -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+    
+    <!-- PWA用アイコン -->
+    <link rel="apple-touch-icon" sizes="180x180" href="app-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="app-icon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="app-icon.png">
+    
+    <!-- PWA用manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B4F92">
     <style>
         * {
             margin: 0;
@@ -44,10 +57,19 @@
         }
         
         .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 1.5rem;
             font-weight: bold;
             color: #8B4F92;
             text-decoration: none;
+        }
+        
+        .logo img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
         }
         
         .nav-links {
@@ -70,7 +92,6 @@
         /* メインビジュアル */
         .hero {
             height: 100vh;
-            /* メインビジュアル画像（4枚目のピンク・紫のハムスター画像）を使用 */
             background-image: url('main-visual.jpg');
             background-size: cover;
             background-position: center;
@@ -111,9 +132,52 @@
             color: #666;
         }
         
+        /* SNSシェアボタン */
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .share-btn.twitter {
+            background: #000000;
+        }
+        
+        .share-btn.line {
+            background: #00C300;
+        }
+        
+        .share-btn.copy {
+            background: #666666;
+        }
+        
         /* セクション共通 */
         section {
-            padding: 5rem 0;
+            padding: 3rem 0;
         }
         
         .section-title {
@@ -221,103 +285,43 @@
         
         .link-item {
             background: white;
-            padding: 2rem 1rem;
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
         }
         
         .link-item:hover {
             transform: translateY(-5px);
-        }
-        
-        .link-item h3 {
-            color: #8B4F92;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
+            background: linear-gradient(135deg, #f8f0ff, #fff0f8);
         }
         
         .link-item a {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
             color: #666;
             text-decoration: none;
             font-size: 0.9rem;
             transition: color 0.3s ease;
             word-break: break-all;
-            display: block;
-            padding: 0 0.5rem;
+            height: 100%;
+            min-height: 120px;
         }
         
         .link-item a:hover {
             color: #8B4F92;
         }
         
-        /* フッター */
-        footer {
-            background: #8B4F92;
-            color: white;
-            text-align: center;
-            padding: 2rem 0;
-        }
-        
-        /* モバイル対応 */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .hero p {
-                font-size: 1rem;
-            }
-            
-            .projects-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-            
-            .links-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-        }
-        
-        /* 画像保護 */
-        .protected-image {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            pointer-events: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .protected-image::selection {
-            background: transparent;
-        }
-        
-        /* 毛色シミュレーター特別表示 */
-        .color-simulator-preview {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 10px;
+        .link-item h3 {
+            color: #8B4F92;
             margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .color-simulator-preview img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-        
-        .color-simulator-preview p {
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            color: #666;
+            font-size: 1.1rem;
+            margin-top: 0;
         }
         
         /* ホーム画面追加ボタン */
@@ -357,12 +361,63 @@
         .add-to-home-btn.hidden {
             display: none !important;
         }
+        
+        /* フッター */
+        footer {
+            background: #8B4F92;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        /* モバイル対応 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .links-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+        
+        /* アニメーション */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
     </style>
 </head>
 <body>
+    <!-- ホーム画面追加ボタン -->
+    <button id="addToHomeBtn" class="add-to-home-btn">
+        <span>📱</span>
+        <span>ホーム画面に追加</span>
+    </button>
+
     <header>
         <nav>
-            <a href="#" class="logo">🐹 はむチラ</a>
+            <a href="#" class="logo">
+                <img src="hamuchira-icon.png" alt="はむチラ">
+                <span>はむチラ</span>
+            </a>
             <ul class="nav-links">
                 <li><a href="#projects">プロジェクト</a></li>
                 <li><a href="#shop">通販</a></li>
@@ -376,6 +431,13 @@
             <h1 class="floating">はむチラの世界へようこそ</h1>
             <p>ハムスター20匹以上の面白可愛いはむライフ</p>
             <p>もっと！はむチラ長屋ch.</p>
+            
+            <!-- SNSシェアボタン -->
+            <div class="share-buttons">
+                <button class="share-btn twitter" onclick="shareTwitter()">Xでシェア</button>
+                <button class="share-btn line" onclick="shareLine()">LINEでシェア</button>
+                <button class="share-btn copy" onclick="copyUrl()">URLをコピー</button>
+            </div>
         </div>
     </section>
 
@@ -429,7 +491,7 @@
                 <!-- 毛色シミュレーター -->
                 <div class="project-card">
                     <div class="project-thumbnail" style="
-                        background: linear-gradient(135deg, #e0c3fc, #9bb5ff);
+                        background-image: url('color-simulator.jpg');
                         background-size: cover;
                         background-position: center;
                     "></div>
@@ -438,7 +500,7 @@
                         <p>ハムスターの遺伝と毛色について学べるシミュレーター。繁殖を考えている方におすすめです。</p>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <a href="https://hamuchira.github.io/hamuchira/" class="project-link" target="_blank" style="flex: 1; min-width: 120px; text-align: center;">シミュレーターを使う</a>
-                            <button id="colorModalBtn" style="
+                            <a href="https://pbs.twimg.com/media/Gwieg6ubEAA9tLm?format=jpg&name=4096x4096" target="_blank" style="
                                 flex: 1; min-width: 120px; text-align: center;
                                 background: linear-gradient(135deg, #ff9ec7, #8B4F92);
                                 color: white;
@@ -450,7 +512,10 @@
                                 font-size: 1rem;
                                 cursor: pointer;
                                 transition: transform 0.3s ease;
-                            ">毛色一覧を見る</button>
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                            ">毛色一覧を見る</a>
                         </div>
                     </div>
                 </div>
@@ -495,16 +560,19 @@
             <h2 class="section-title">通販</h2>
             <div class="links-grid">
                 <div class="link-item">
-                    <h3>🛍️ BOOTH</h3>
-                    <a href="https://hamchira.booth.pm/" target="_blank">hamchira.booth.pm</a>
+                    <a href="https://hamchira.booth.pm/" target="_blank">
+                        <h3>🛍️ BOOTH</h3>
+                    </a>
                 </div>
                 <div class="link-item">
-                    <h3>👕 SUZURI</h3>
-                    <a href="https://suzuri.jp/86star2020" target="_blank">suzuri.jp/86star2020</a>
+                    <a href="https://suzuri.jp/86star2020" target="_blank">
+                        <h3>👕 SUZURI</h3>
+                    </a>
                 </div>
                 <div class="link-item">
-                    <h3>🎨 minne</h3>
-                    <a href="https://minne.com/@86sta2020" target="_blank">minne.com/@86sta2020</a>
+                    <a href="https://minne.com/@86sta2020" target="_blank">
+                        <h3>🎨 minne</h3>
+                    </a>
                 </div>
             </div>
         </div>
@@ -515,12 +583,14 @@
             <h2 class="section-title">SNS</h2>
             <div class="links-grid">
                 <div class="link-item">
-                    <h3>🐦 X (Twitter)</h3>
-                    <a href="https://x.com/86star2020" target="_blank">@86star2020</a>
+                    <a href="https://x.com/86star2020" target="_blank">
+                        <h3>X</h3>
+                    </a>
                 </div>
                 <div class="link-item">
-                    <h3>📷 Instagram</h3>
-                    <a href="https://www.instagram.com/86star2020/" target="_blank">@86star2020</a>
+                    <a href="https://www.instagram.com/86star2020/" target="_blank">
+                        <h3>Instagram</h3>
+                    </a>
                 </div>
             </div>
         </div>
@@ -533,6 +603,92 @@
     </footer>
 
     <script>
+        // SNSシェア機能
+        function shareTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('はむチラ - ハムスター20匹以上の面白可愛いはむライフ 🐹✨');
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+        }
+        
+        function shareLine() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('はむチラ - ハムスター20匹以上の面白可愛いはむライフ 🐹✨');
+            window.open(`https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`, '_blank');
+        }
+        
+        function copyUrl() {
+            navigator.clipboard.writeText(window.location.href).then(function() {
+                // コピー成功時の表示
+                const btn = event.target;
+                const originalContent = btn.innerHTML;
+                btn.innerHTML = 'コピー完了！';
+                btn.style.background = '#4CAF50';
+                
+                setTimeout(function() {
+                    btn.innerHTML = originalContent;
+                    btn.style.background = '#666666';
+                }, 2000);
+            }).catch(function() {
+                // フォールバック: テキスト選択
+                const textArea = document.createElement('textarea');
+                textArea.value = window.location.href;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                alert('URLがコピーされました！');
+            });
+        }
+        
+        // ホーム画面追加機能
+        document.addEventListener('DOMContentLoaded', function() {
+            let deferredPrompt;
+            const addToHomeBtn = document.getElementById('addToHomeBtn');
+            
+            // ボタンのクリックイベント関数
+            function handleAddToHomeClick(e) {
+                e.preventDefault();
+                
+                if (deferredPrompt) {
+                    // インストールプロンプトを表示
+                    deferredPrompt.prompt();
+                    // ユーザーの選択を待つ
+                    deferredPrompt.userChoice.then(function(result) {
+                        console.log('User response to the install prompt: ' + result.outcome);
+                        // プロンプトを使用済みにする
+                        deferredPrompt = null;
+                    });
+                } else {
+                    // PWAインストールが利用できない場合の処理
+                    if (navigator.userAgent.match(/iPhone|iPad|iPod/)) {
+                        // iOS Safari の場合
+                        alert('ホーム画面に追加するには：\n1. 共有ボタン（□↑）をタップ\n2. 「ホーム画面に追加」を選択してください');
+                    } else if (navigator.userAgent.match(/Android/)) {
+                        // Android Chrome の場合
+                        alert('ホーム画面に追加するには：\n1. メニュー（⋮）をタップ\n2. 「ホーム画面に追加」を選択してください');
+                    } else {
+                        // その他のブラウザ
+                        alert('このブラウザではホーム画面への追加がサポートされていません。\nブラウザのブックマーク機能をご利用ください。');
+                    }
+                }
+            }
+            
+            // ボタンにイベントリスナーを追加
+            if (addToHomeBtn) {
+                addToHomeBtn.style.display = 'flex';
+                addToHomeBtn.addEventListener('click', handleAddToHomeClick);
+            }
+            
+            // PWAインストールプロンプトイベントをキャッチ
+            window.addEventListener('beforeinstallprompt', function(e) {
+                // デフォルトのプロンプトを阻止
+                e.preventDefault();
+                // 後で使用するためにイベントを保存
+                deferredPrompt = e;
+            });
+        });
+        
         // 右クリック防止（画像保護）
         document.addEventListener('contextmenu', function(e) {
             if (e.target.classList.contains('protected-image') || 
@@ -586,132 +742,6 @@
             el.style.transform = 'translateY(30px)';
             el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(el);
-        });
-        
-        // ページ読み込み完了後に実行
-        document.addEventListener('DOMContentLoaded', function() {
-            // モーダル機能
-            function openModal() {
-                const modal = document.getElementById('colorModal');
-                if (modal) {
-                    modal.style.display = 'block';
-                    document.body.style.overflow = 'hidden'; // スクロール防止
-                }
-            }
-            
-            function closeModal() {
-                const modal = document.getElementById('colorModal');
-                if (modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto'; // スクロール復元
-                }
-            }
-            
-            // プレビューエリアの代わりにボタンのクリックイベント
-            const colorModalBtn = document.getElementById('colorModalBtn');
-            if (colorModalBtn) {
-                colorModalBtn.addEventListener('click', openModal);
-                
-                // ホバー効果
-                colorModalBtn.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-2px)';
-                });
-                colorModalBtn.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            }
-            
-            // 閉じるボタンのクリックイベント
-            const closeBtn = document.querySelector('.modal-close');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeModal);
-            }
-            
-            // モーダル外クリックで閉じる
-            const modal = document.getElementById('colorModal');
-            if (modal) {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeModal();
-                    }
-                });
-            }
-            
-            // ESCキーで閉じる
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeModal();
-                }
-            });
-            
-            // 右クリック防止（モーダル画像）
-            document.addEventListener('contextmenu', function(e) {
-                if (e.target.classList.contains('modal-image')) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-            
-            // ドラッグ防止（モーダル画像）
-            document.addEventListener('dragstart', function(e) {
-                if (e.target.classList.contains('modal-image')) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-        });
-        
-        // ホーム画面追加機能
-        document.addEventListener('DOMContentLoaded', function() {
-            let deferredPrompt;
-            const addToHomeBtn = document.getElementById('addToHomeBtn');
-            const addToHomeBtn2 = document.getElementById('addToHomeBtn2');
-            
-            // ボタンのクリックイベント関数
-            function handleAddToHomeClick(e) {
-                e.preventDefault();
-                
-                if (deferredPrompt) {
-                    // インストールプロンプトを表示
-                    deferredPrompt.prompt();
-                    // ユーザーの選択を待つ
-                    deferredPrompt.userChoice.then(function(result) {
-                        console.log('User response to the install prompt: ' + result.outcome);
-                        // プロンプトを使用済みにする
-                        deferredPrompt = null;
-                    });
-                } else {
-                    // PWAインストールが利用できない場合の処理
-                    if (navigator.userAgent.match(/iPhone|iPad|iPod/)) {
-                        // iOS Safari の場合
-                        alert('ホーム画面に追加するには：\n1. 共有ボタン（□↑）をタップ\n2. 「ホーム画面に追加」を選択してください');
-                    } else if (navigator.userAgent.match(/Android/)) {
-                        // Android Chrome の場合
-                        alert('ホーム画面に追加するには：\n1. メニュー（⋮）をタップ\n2. 「ホーム画面に追加」を選択してください');
-                    } else {
-                        // その他のブラウザ
-                        alert('このブラウザではホーム画面への追加がサポートされていません。\nブラウザのブックマーク機能をご利用ください。');
-                    }
-                }
-            }
-            
-            // 両方のボタンにイベントリスナーを追加
-            if (addToHomeBtn) {
-                addToHomeBtn.style.display = 'flex';
-                addToHomeBtn.addEventListener('click', handleAddToHomeClick);
-            }
-            
-            if (addToHomeBtn2) {
-                addToHomeBtn2.addEventListener('click', handleAddToHomeClick);
-            }
-            
-            // PWAインストールプロンプトイベントをキャッチ
-            window.addEventListener('beforeinstallprompt', function(e) {
-                // デフォルトのプロンプトを阻止
-                e.preventDefault();
-                // 後で使用するためにイベントを保存
-                deferredPrompt = e;
-            });
         });
     </script>
 </body>
