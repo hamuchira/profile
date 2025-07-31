@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>はむぴよ - ハムスター赤ちゃん成長記録</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background: linear-gradient(135deg, #fef7ed 0%, #fef3c7 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #fef7ed 0%, #fef3c7 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(251, 146, 60, 0.1), 0 4px 6px -2px rgba(251, 146, 60, 0.05);
+        }
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(251, 146, 60, 0.15), 0 10px 10px -5px rgba(251, 146, 60, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        // アイコンのSVG定義
+        const icons = {
+            calendar: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>',
+            download: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>',
+            upload: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>',
+            plus: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>',
+            trash: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>',
+            edit: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>'
+        };
+
+        // アプリケーションの状態
+        let state = {
+            records: [],
+            selectedMother: '',
+            newMotherName: '',
+            newBirthDate: '',
+            isAddingMother: false,
+            editingMother: null
+        };
+
+        // 日付を30日分生成
+        function generateDays(birthDate) {
+            const days = [];
+            const birth = new Date(birthDate);
+            
+            for (let i = 0; i <= 30; i++) {
+                const date = new Date(birth);
+                date.setDate(birth.getDate() + i);
+                days.push({
+                    day: i,
+                    date: date.toISOString().split('T')[0],
+                    displayDate: date.toLocaleDateString('ja-JP', {
+                        month: 'numeric',
+                        day: 'numeric',
+                        weekday: 'short'
+                    })
+                });
+            }
+            return days;
+        }
+
+        // 新しい母親の記録を追加
+        function addMotherRecord() {
+            if (!state.newMotherName.trim() || !state.newBirthDate) return;
+            
+            const newRecord = {
+                id: Date.now(),
+                motherName: state.newMotherName.trim(),
+                birthDate: state.newBirthDate,
+                days: generateDays(state.newBirthDate),
+                notes: {}
+            };
+            
+            state.records.push(newRecord);
+            state.selectedMother = state.newMotherName.trim();
+            state.newMotherName = '';
+            state.newBirthDate = '';
+            state.isAddingMother = false;
+            render();
+        }
+
+        // 母親の記録を削除
+        function deleteMotherRecord(motherName) {
+            if (confirm(`${motherName}の記録を削除しますか？`)) {
+                state.records = state.records.filter(record => record.motherName !== motherName);
+                if (state.selectedMother === motherName) {
+                    state.selectedMother = state.records.length > 0 ? state.records[0].motherName : '';
+                }
+                render();
+            }
+        }
+
+        // 母親名を編集
+        function editMotherName(oldName, newName) {
+            if (!newName.trim()) return;
+            
+            state.records = state.records.map(record => 
+                record.motherName === oldName 
+                    ? { ...record, motherName: newName.trim() }
+                    : record
+            );
+            
+            if (state.selectedMother === oldName) {
+                state.selectedMother = newName.trim();
+            }
+            state.editingMother = null;
+            render();
+        }
+
+        // メモを更新
+        function updateNote(day, note) {
+            state.records = state.records.map(record => 
+                record.motherName === state.selectedMother
+                    ? {
+                        ...record,
+                        notes: { ...record.notes, [day]: note }
+                    }
+                    : record
+            );
+        }
+
+        // 現在選択中の記録を取得
+        function getCurrentRecord() {
+            return state.records.find(record => record.motherName === state.selectedMother);
+        }
+
+        // CSVエクスポート
+        function exportToCSV() {
+            const currentRecord = getCurrentRecord();
+            if (!currentRecord) return;
+            
+            const csvContent = [
+                ['母親名', '誕生日', '生後日数', '日付', '曜日', 'メモ'],
+                ...currentRecord.days.map(day => [
+                    currentRecord.motherName,
+                    currentRecord.birthDate,
+                    `${day.day}日目`,
+                    day.date,
+                    day.displayDate.split(' ')[1] || '',
+                    currentRecord.notes[day.day] || ''
+                ])
+            ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${currentRecord.motherName}_成長記録.csv`;
+            link.click();
+        }
+
+        // 全データエクスポート
+        function exportAllData() {
+            const dataStr = JSON.stringify(state.records, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'hamster_records_backup.json';
+            link.click();
+        }
+
+        // データインポート
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData) && importedData.every(record => 
+                        record.motherName && record.birthDate && record.days
+                    )) {
+                        if (confirm('既存のデータに追加しますか？（キャンセルで既存データを置き換え）')) {
+                            state.records = [...state.records, ...importedData];
+                        } else {
+                            state.records = importedData;
+                            state.selectedMother = importedData.length > 0 ? importedData[0].motherName : '';
+                        }
+                        render();
+                    } else {
+                        alert('無効なファイル形式です');
+                    }
+                } catch (error) {
+                    alert('ファイルの読み込みに失敗しました');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // 今日の日付から生後何日目かを計算
+        function getCurrentDay() {
+            const currentRecord = getCurrentRecord();
+            if (!currentRecord) return null;
+            
+            try {
+                const today = new Date();
+                const birth = new Date(currentRecord.birthDate);
+                const diffTime = today - birth;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays < 0 || diffDays > 30) return null;
+                return diffDays;
+            } catch (error) {
+                console.error('日付計算エラー:', error);
+                return null;
+            }
+        }
+
+        // レンダリング関数
+        function render() {
+            const currentRecord = getCurrentRecord();
+            const currentDay = getCurrentDay();
+
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="gradient-bg max-w-6xl mx-auto p-6 min-h-screen">
+                    <div class="bg-white rounded-xl card-shadow hover-lift p-6 mb-6">
+                        <div class="text-center mb-6">
+                            <div class="flex items-center justify-center gap-3 mb-1">
+                                <h1 class="text-4xl font-bold text-orange-800">
+                                    はむぴよ
+                                </h1>
+                            </div>
+                            <p class="text-sm text-orange-600">ハムスター赤ちゃんの成長記録</p>
+                        </div>
+                        
+                        <div class="flex flex-col gap-4 mb-6">
+                            <div class="flex flex-wrap gap-3 items-center justify-between">
+                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                    <select
+                                        id="motherSelect"
+                                        class="flex-1 min-w-0 px-3 py-2 border-2 border-orange-200 rounded-lg focus:border-orange-400 focus:outline-none text-sm"
+                                    >
+                                        <option value="">母親を選択</option>
+                                        ${state.records.map(record => 
+                                            `<option value="${record.motherName}" ${record.motherName === state.selectedMother ? 'selected' : ''}>${record.motherName}</option>`
+                                        ).join('')}
+                                    </select>
+                                    
+                                    <button
+                                        onclick="state.isAddingMother = true; render();"
+                                        class="flex items-center gap-1 px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm whitespace-nowrap"
+                                    >
+                                        ${icons.plus}
+                                        追加
+                                    </button>
+                                    
+                                    ${state.selectedMother ? `
+                                        <div class="flex gap-1">
+                                            <button
+                                                onclick="state.editingMother = '${state.selectedMother}'; render();"
+                                                class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="名前を編集"
+                                            >
+                                                ${icons.edit}
+                                            </button>
+                                            <button
+                                                onclick="deleteMotherRecord('${state.selectedMother}')"
+                                                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="記録を削除"
+                                            >
+                                                ${icons.trash}
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            
+                            ${currentRecord ? `
+                                <div class="flex flex-wrap gap-2 justify-center">
+                                    <button
+                                        onclick="exportToCSV()"
+                                        class="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                                    >
+                                        ${icons.download}
+                                        1匹CSV出力
+                                    </button>
+                                    
+                                    <button
+                                        onclick="exportAllData()"
+                                        class="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm"
+                                    >
+                                        ${icons.download}
+                                        全匹データ出力
+                                    </button>
+                                    
+                                    <label class="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors cursor-pointer text-sm">
+                                        ${icons.upload}
+                                        データ復元
+                                        <input
+                                            type="file"
+                                            accept=".json"
+                                            onchange="importData(event)"
+                                            class="hidden"
+                                        />
+                                    </label>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        ${state.isAddingMother ? `
+                            <div class="bg-green-50 p-4 rounded-lg mb-6 border-2 border-green-200">
+                                <h3 class="font-semibold text-green-800 mb-3 text-center">新しい母親の記録を追加</h3>
+                                <div class="flex flex-col gap-4 items-center">
+                                    <div class="w-full max-w-md">
+                                        <label class="block text-sm font-medium text-green-700 mb-1 text-center">母親の名前</label>
+                                        <input
+                                            type="text"
+                                            id="newMotherName"
+                                            value="${state.newMotherName}"
+                                            oninput="state.newMotherName = this.value"
+                                            class="w-full px-3 py-2 border border-green-300 rounded-lg focus:border-green-500 focus:outline-none text-sm text-center"
+                                            placeholder="例: ハナ"
+                                        />
+                                    </div>
+                                    <div class="w-full max-w-md">
+                                        <label class="block text-sm font-medium text-green-700 mb-1 text-center">誕生日</label>
+                                        <input
+                                            type="date"
+                                            id="newBirthDate"
+                                            value="${state.newBirthDate}"
+                                            oninput="state.newBirthDate = this.value"
+                                            class="w-full px-3 py-2 border border-green-300 rounded-lg focus:border-green-500 focus:outline-none text-sm text-center"
+                                        />
+                                    </div>
+                                    <div class="flex gap-2 mt-2">
+                                        <button
+                                            onclick="addMotherRecord()"
+                                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                                        >
+                                            追加
+                                        </button>
+                                        <button
+                                            onclick="state.isAddingMother = false; render();"
+                                            class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors text-sm"
+                                        >
+                                            キャンセル
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${state.editingMother ? `
+                            <div class="bg-blue-50 p-4 rounded-lg mb-6 border-2 border-blue-200">
+                                <h3 class="font-semibold text-blue-800 mb-3">母親の名前を編集</h3>
+                                <div class="flex flex-col sm:flex-row gap-3 items-end">
+                                    <div class="flex-1 min-w-0">
+                                        <label class="block text-sm font-medium text-blue-700 mb-1">新しい名前</label>
+                                        <input
+                                            type="text"
+                                            id="editNameInput"
+                                            value="${state.editingMother}"
+                                            class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:border-blue-500 focus:outline-none text-sm"
+                                        />
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button
+                                            onclick="editMotherName('${state.editingMother}', document.getElementById('editNameInput').value)"
+                                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                                        >
+                                            変更
+                                        </button>
+                                        <button
+                                            onclick="state.editingMother = null; render();"
+                                            class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors text-sm"
+                                        >
+                                            キャンセル
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${currentRecord && currentDay !== null ? `
+                            <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6">
+                                <p class="text-yellow-800 font-semibold">
+                                    🎯 今日は ${currentRecord.motherName} の赤ちゃんの生後 ${currentDay} 日目です！
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    ${currentRecord ? `
+                        <div class="bg-white rounded-xl card-shadow hover-lift p-6">
+                            <h2 class="text-xl font-semibold text-orange-800 mb-4 flex items-center gap-2">
+                                ${icons.calendar}
+                                ${currentRecord.motherName} の成長記録（誕生日: ${new Date(currentRecord.birthDate).toLocaleDateString('ja-JP')}）
+                            </h2>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                ${currentRecord.days.map((day) => `
+                                    <div class="border-2 rounded-lg p-4 transition-all ${
+                                        day.day === currentDay
+                                            ? 'border-yellow-400 bg-yellow-50 shadow-md'
+                                            : day.day === 0
+                                            ? 'border-pink-300 bg-pink-50'
+                                            : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                                    }">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <div class="font-bold text-lg ${
+                                                    day.day === currentDay ? 'text-yellow-700' :
+                                                    day.day === 0 ? 'text-pink-700' : 'text-gray-700'
+                                                }">
+                                                    ${day.day === 0 ? '誕生日' : `${day.day}日目`}
+                                                </div>
+                                                <div class="text-sm text-gray-600">
+                                                    ${day.displayDate}
+                                                </div>
+                                            </div>
+                                            ${day.day === currentDay ? '<span class="text-2xl">🎯</span>' : ''}
+                                            ${day.day === 0 ? '<span class="text-2xl">🎂</span>' : ''}
+                                        </div>
+                                        
+                                        <textarea
+                                            placeholder="メモを入力..."
+                                            onchange="updateNote(${day.day}, this.value)"
+                                            class="w-full h-20 p-2 text-sm border border-gray-300 rounded resize-none focus:border-orange-400 focus:outline-none"
+                                        >${(currentRecord.notes && currentRecord.notes[day.day]) || ''}</textarea>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${state.records.length === 0 ? `
+                        <div class="bg-white rounded-xl card-shadow hover-lift p-12 text-center">
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">まだ記録がありません</h3>
+                            <p class="text-gray-500 mb-6">「追加」ボタンから最初の記録を作成してください</p>
+                            <button
+                                onclick="state.isAddingMother = true; render();"
+                                class="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors mx-auto"
+                            >
+                                ${icons.plus}
+                                最初の記録を作成
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            // セレクトボックスのイベントリスナーを再設定
+            const motherSelect = document.getElementById('motherSelect');
+            if (motherSelect) {
+                motherSelect.addEventListener('change', (e) => {
+                    state.selectedMother = e.target.value;
+                    render();
+                });
+            }
+        }
+
+        // 初期レンダリング
+        render();
+    </script>
+</body>
+</html>
