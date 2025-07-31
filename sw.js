@@ -1,19 +1,19 @@
 // Service Worker for はむチラ PWA
 const CACHE_NAME = 'hamuchira-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/main-visual.jpg',
-  '/youtube-channel.jpg',
-  '/hamuchira-pedia.jpg',
-  '/hamuchira-gacha.jpg',
-  '/color-simulator.jpg',
-  '/age-calculator.jpg',
-  '/hampiyou.jpg',
-  '/hamuchira-icon.png',
-  '/favicon.png',
-  '/app-icon.png',
-  '/manifest.json'
+  './',
+  './index.html',
+  './main-visual.jpg',
+  './youtube-channel.jpg',
+  './hamuchira-pedia.jpg',
+  './hamuchira-gacha.jpg',
+  './color-simulator.jpg',
+  './age-calculator.jpg',
+  './hampiyou.jpg',
+  './hamuchira-icon.png',
+  './favicon.png',
+  './app-icon.png',
+  './manifest.json'
 ];
 
 // インストール時のキャッシュ
@@ -78,7 +78,7 @@ self.addEventListener('fetch', function(event) {
         }).catch(function() {
           // ネットワークエラーの場合、基本的なHTMLを返す（オフライン対応）
           if (event.request.destination === 'document') {
-            return caches.match('/index.html');
+            return caches.match('./index.html');
           }
         });
       })

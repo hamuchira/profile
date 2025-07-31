@@ -2,12 +2,12 @@
   "name": "はむチラ - ハムスターの可愛い世界",
   "short_name": "はむチラ",
   "description": "ハムスター20匹以上の面白可愛いはむライフ - もっと！はむチラ長屋ch.",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffeef7",
   "theme_color": "#8B4F92",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "./",
   "lang": "ja",
   "icons": [
     {
