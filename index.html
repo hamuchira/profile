@@ -97,7 +97,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
+            padding: 0.8rem 2rem;
         }
         
         .logo {
@@ -145,6 +145,7 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            padding-top: 70px;
         }
         
         .hero::before {
@@ -161,6 +162,7 @@
         .hero-content {
             z-index: 2;
             color: #333;
+            padding: 1rem;
         }
         
         .hero h1 {
@@ -172,7 +174,7 @@
         
         .hero p {
             font-size: 1.2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             color: #666;
         }
         
@@ -181,7 +183,7 @@
             display: flex;
             gap: 10px;
             justify-content: center;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             flex-wrap: wrap;
         }
         
@@ -435,33 +437,38 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             position: sticky;
-            top: 70px;
+            top: 60px;
             z-index: 999;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
         .global-nav-container {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             padding: 0.8rem 0.5rem;
-            gap: 0.4rem;
-            flex-wrap: wrap;
-            max-width: 100%;
+            gap: 0.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .global-nav-item {
             background: linear-gradient(135deg, #ff9ec7, #8B4F92);
             color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 50px;
+            padding: 0.8rem 0.3rem;
+            border-radius: 15px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.85rem;
-            white-space: nowrap;
+            font-size: 0.7rem;
             transition: all 0.3s ease;
             box-shadow: 0 2px 10px rgba(139, 79, 146, 0.2);
             text-align: center;
-            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            min-height: 70px;
+            line-height: 1.2;
         }
         
         .global-nav-item:hover {
@@ -471,6 +478,35 @@
         
         .global-nav-item.active {
             background: linear-gradient(135deg, #8B4F92, #ff9ec7);
+        }
+        
+        /* 閉じるボタン（固定表示） */
+        .close-news-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff9ec7, #8B4F92);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(139, 79, 146, 0.4);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .close-news-btn.show {
+            display: block;
+        }
+        
+        .close-news-btn:hover {
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 6px 25px rgba(139, 79, 146, 0.6);
         }
         
         /* 2カラムレイアウト(タブレット以上) */
@@ -483,17 +519,24 @@
         /* モバイル対応 */
         @media (max-width: 768px) {
             .global-nav {
-                top: 60px;
+                top: 55px;
             }
             
             .global-nav-container {
-                padding: 0.8rem;
+                padding: 0.6rem 0.5rem;
                 gap: 0.4rem;
+                grid-template-columns: repeat(3, 1fr);
             }
             
             .global-nav-item {
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
+                padding: 0.6rem 0.2rem;
+                font-size: 0.65rem;
+                min-height: 65px;
+                gap: 0.2rem;
+            }
+            
+            .hero {
+                padding-top: 60px;
             }
             
             .hero h1 {
@@ -511,6 +554,12 @@
             
             .links-grid {
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .close-news-btn {
+                bottom: 20px;
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
             }
         }
         
@@ -609,6 +658,11 @@
         <span>ホーム画面に追加</span>
     </button>
 
+    <!-- 閉じるボタン（固定表示） -->
+    <button id="closeNewsBtn" class="close-news-btn" onclick="closeNews()">
+        閉じる ×
+    </button>
+
     <header>
         <nav>
             <a href="#" class="logo">
@@ -621,12 +675,30 @@
     <!-- グローバルナビゲーション -->
     <nav class="global-nav">
         <div class="global-nav-container">
-            <a href="#limited" class="global-nav-item">🎉 期間限定</a>
-            <a href="#learn" class="global-nav-item">📚 はむチラとは？</a>
-            <a href="#useful" class="global-nav-item">🐹 お役立ち</a>
-            <a href="#projects" class="global-nav-item">🎮 ゲーム</a>
-            <a href="#shop" class="global-nav-item">🛍️ 通販</a>
-            <a href="#sns" class="global-nav-item">📱 SNS</a>
+            <a href="#limited" class="global-nav-item">
+                <span style="font-size: 1.5rem;">🎉</span>
+                <span>期間限定</span>
+            </a>
+            <a href="#learn" class="global-nav-item">
+                <span style="font-size: 1.5rem;">📚</span>
+                <span>はむチラとは？</span>
+            </a>
+            <a href="#useful" class="global-nav-item">
+                <span style="font-size: 1.5rem;">🐹</span>
+                <span>お役立ち</span>
+            </a>
+            <a href="#projects" class="global-nav-item">
+                <span style="font-size: 1.5rem;">🎮</span>
+                <span>ゲーム</span>
+            </a>
+            <a href="#shop" class="global-nav-item">
+                <span style="font-size: 1.5rem;">🛍️</span>
+                <span>通販</span>
+            </a>
+            <a href="#sns" class="global-nav-item">
+                <span style="font-size: 1.5rem;">📱</span>
+                <span>SNS・あゆみ</span>
+            </a>
         </div>
     </nav>
 
@@ -1109,6 +1181,7 @@
         function toggleNews() {
             const hiddenItems = document.querySelectorAll('.news-item-hidden');
             const toggleBtn = document.getElementById('toggleNewsBtn');
+            const closeBtn = document.getElementById('closeNewsBtn');
             
             if (hiddenItems[0].style.display === 'flex') {
                 // 閉じる
@@ -1116,13 +1189,31 @@
                     item.style.display = 'none';
                 });
                 toggleBtn.innerHTML = 'もっと見る ▼';
+                closeBtn.classList.remove('show');
             } else {
                 // 開く
                 hiddenItems.forEach(item => {
                     item.style.display = 'flex';
                 });
                 toggleBtn.innerHTML = '閉じる ▲';
+                closeBtn.classList.add('show');
             }
+        }
+        
+        // 固定閉じるボタンで閉じる
+        function closeNews() {
+            const hiddenItems = document.querySelectorAll('.news-item-hidden');
+            const toggleBtn = document.getElementById('toggleNewsBtn');
+            const closeBtn = document.getElementById('closeNewsBtn');
+            
+            hiddenItems.forEach(item => {
+                item.style.display = 'none';
+            });
+            toggleBtn.innerHTML = 'もっと見る ▼';
+            closeBtn.classList.remove('show');
+            
+            // あゆみセクションまでスクロール
+            document.getElementById('news').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         // ページ読み込み時にニュースを取得
