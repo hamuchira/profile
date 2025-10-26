@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>はむチラ - ハムスターの可愛い世界</title>
     
     <!-- ファビコン -->
@@ -25,10 +28,36 @@
                 navigator.serviceWorker.register('sw.js')
                     .then(function(registration) {
                         console.log('ServiceWorker registration successful');
+                        
+                        // 定期的に更新をチェック（1時間ごと）
+                        setInterval(function() {
+                            registration.update();
+                        }, 60 * 60 * 1000);
+                        
+                        // 新しいService Workerが見つかったら自動的に更新
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // 新しいコンテンツが利用可能
+                                    console.log('新しいコンテンツが利用可能です');
+                                    // 新しいService Workerをアクティブ化
+                                    newWorker.postMessage({ action: 'skipWaiting' });
+                                }
+                            });
+                        });
                     })
                     .catch(function(err) {
                         console.log('ServiceWorker registration failed: ', err);
                     });
+                
+                // Service Workerが更新されたらページをリロード
+                let refreshing;
+                navigator.serviceWorker.addEventListener('controllerchange', function() {
+                    if (refreshing) return;
+                    refreshing = true;
+                    window.location.reload();
+                });
             });
         }
     </script>
@@ -414,24 +443,25 @@
         .global-nav-container {
             display: flex;
             justify-content: center;
-            padding: 1rem;
-            gap: 0.5rem;
+            padding: 0.8rem 0.5rem;
+            gap: 0.4rem;
             flex-wrap: wrap;
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 100%;
         }
         
         .global-nav-item {
             background: linear-gradient(135deg, #ff9ec7, #8B4F92);
             color: white;
-            padding: 0.6rem 1.5rem;
+            padding: 0.6rem 1.2rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             white-space: nowrap;
             transition: all 0.3s ease;
             box-shadow: 0 2px 10px rgba(139, 79, 146, 0.2);
+            text-align: center;
+            flex: 0 0 auto;
         }
         
         .global-nav-item:hover {
@@ -593,8 +623,8 @@
         <div class="global-nav-container">
             <a href="#limited" class="global-nav-item">🎉 期間限定</a>
             <a href="#learn" class="global-nav-item">📚 はむチラとは？</a>
-            <a href="#useful" class="global-nav-item">🐹 飼育お役立ち</a>
-            <a href="#projects" class="global-nav-item">🎮 ハムスターゲーム</a>
+            <a href="#useful" class="global-nav-item">🐹 お役立ち</a>
+            <a href="#projects" class="global-nav-item">🎮 ゲーム</a>
             <a href="#shop" class="global-nav-item">🛍️ 通販</a>
             <a href="#sns" class="global-nav-item">📱 SNS</a>
         </div>
@@ -1143,6 +1173,16 @@
             let deferredPrompt;
             const addToHomeBtn = document.getElementById('addToHomeBtn');
             
+            // スタンドアロンモードまたはインストール済みの場合は即座に非表示
+            if (window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone ||
+                document.referrer.includes('android-app://')) {
+                if (addToHomeBtn) {
+                    addToHomeBtn.remove(); // DOMから完全に削除
+                }
+                return; // 以降の処理をスキップ
+            }
+            
             // PWAインストールプロンプトイベントをキャッチ
             window.addEventListener('beforeinstallprompt', function(e) {
                 // デフォルトのプロンプトを阻止
@@ -1166,9 +1206,9 @@
                     deferredPrompt.userChoice.then(function(result) {
                         console.log('User response: ' + result.outcome);
                         deferredPrompt = null;
-                        // インストール後はボタンを非表示
+                        // インストール後はボタンを完全に削除
                         if (addToHomeBtn) {
-                            addToHomeBtn.style.display = 'none';
+                            addToHomeBtn.remove();
                         }
                     });
                 } else {
@@ -1194,16 +1234,9 @@
             window.addEventListener('appinstalled', function(evt) {
                 console.log('アプリがインストールされました');
                 if (addToHomeBtn) {
-                    addToHomeBtn.style.display = 'none';
+                    addToHomeBtn.remove(); // DOMから完全に削除
                 }
             });
-            
-            // 既にスタンドアロンモードの場合はボタンを非表示
-            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-                if (addToHomeBtn) {
-                    addToHomeBtn.style.display = 'none';
-                }
-            }
         });
         
         // 右クリック防止（画像保護）
