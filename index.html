@@ -281,6 +281,20 @@
             text-decoration: none;
             font-weight: 500;
             transition: transform 0.3s ease;
+            margin: 0 auto;
+        }
+        
+        /* ボタンを中央配置するためのコンテナ */
+        .project-info > a,
+        .project-info > button,
+        .project-info > div {
+            display: block;
+            text-align: center;
+        }
+        
+        .project-info > div > a,
+        .project-info > div > button {
+            display: inline-flex;
         }
         
         .project-link:hover {
@@ -937,8 +951,8 @@
         
         // スプレッドシートからニュースを読み込む
         function loadNews() {
-            // ここにスプレッドシートのURLを設定してください
-            const SPREADSHEET_URL = 'YOUR_SPREADSHEET_URL_HERE';
+            // スプレッドシートの公開URL
+            const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTuw2B7dBg1IQkIgMj6V9vjZy5uUp64CdHJdsYmR2A1QsGxz8tW0warnL95c1Ab26Bg6QsmT3fxLf_T/pub?gid=0&single=true&output=csv';
             
             fetch(SPREADSHEET_URL)
                 .then(response => response.text())
