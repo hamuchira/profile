@@ -1,73 +1,118 @@
-// Service Worker for はむチラ PWA
-const CACHE_NAME = 'hamuchira-v1';
+// Service Workerのバージョン - 更新するたびにこの番号を変更してください
+const CACHE_VERSION = 'v2.0.0';
+const CACHE_NAME = 'hamuchira-cache-' + CACHE_VERSION;
+
+// キャッシュするファイルのリスト
 const urlsToCache = [
   './',
   './index.html',
-  './main-visual.jpg',
-  './youtube-channel.jpg',
-  './hamuchira-pedia.jpg',
-  './hamuchira-gacha.jpg',
-  './color-simulator.jpg',
-  './age-calculator.jpg',
-  './hampiyou.jpg',
+  './hamchira_profile_site.html',
   './hamuchira-icon.png',
   './favicon.png',
   './app-icon.png',
-  './manifest.json'
+  './main-visual.jpg',
+  // 画像ファイル
+  './hamuoff.jpg',
+  './hamumvp.jpg',
+  './youtube.jpg',
+  './hamuchira-pedia.jpg',
+  './hamuchira-soukan.png',
+  './hamuchira-keizu.png',
+  './keisikisimyu.jpg',
+  './haymihyou.jpg',
+  './hampiyou.jpg',
+  './gachagacha.jpg',
+  './hamuketsu-poyo.jpg',
+  './hamuketsu-card.jpg',
+  './hamukororin.jpg'
 ];
 
-// インストール時のキャッシュ
+// Service Workerのインストール
 self.addEventListener('install', function(event) {
+  console.log('[Service Worker] Installing Service Worker...', event);
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
-        console.log('Opened cache');
+        console.log('[Service Worker] Caching app shell');
+        // キャッシュに失敗してもインストールを続行
         return cache.addAll(urlsToCache.map(url => {
-          return new Request(url, {cache: 'reload'});
-        }));
+          return new Request(url, {cache: 'no-cache'});
+        })).catch(function(error) {
+          console.log('[Service Worker] Cache failed for some assets:', error);
+        });
       })
-      .catch(function(error) {
-        console.log('Cache addAll failed:', error);
+      .then(function() {
+        // 新しいService Workerをすぐにアクティブ化
+        return self.skipWaiting();
       })
   );
-  self.skipWaiting();
 });
 
-// アクティベーション時の古いキャッシュ削除
+// Service Workerのアクティベーション
 self.addEventListener('activate', function(event) {
+  console.log('[Service Worker] Activating Service Worker...', event);
+  
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
+          // 古いキャッシュを削除
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
+            console.log('[Service Worker] Removing old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(function() {
+      // 新しいService Workerをすべてのクライアントで即座に有効化
+      return self.clients.claim();
     })
   );
-  self.clients.claim();
 });
 
-// リクエストの処理（キャッシュファーストストラテジー）
+// リクエストの処理（Network First戦略）
 self.addEventListener('fetch', function(event) {
+  // HTMLファイルとスプレッドシートデータは常に最新を取得
+  if (event.request.url.includes('.html') || 
+      event.request.url.includes('docs.google.com/spreadsheets')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(function(response) {
+          // 成功したらキャッシュも更新
+          if (response && response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then(function(cache) {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(function() {
+          // ネットワークに失敗したらキャッシュから返す
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+  
+  // その他のリソースはキャッシュ優先
   event.respondWith(
     caches.match(event.request)
       .then(function(response) {
-        // キャッシュにある場合はそれを返す
+        // キャッシュにあればそれを返す
         if (response) {
           return response;
         }
         
-        // キャッシュにない場合はネットワークから取得
+        // キャッシュになければネットワークから取得
         return fetch(event.request).then(function(response) {
-          // 有効なレスポンスかチェック
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+          // レスポンスが有効でない場合はそのまま返す
+          if (!response || response.status !== 200 || response.type === 'error') {
             return response;
           }
           
-          // レスポンスをクローンしてキャッシュに保存
+          // レスポンスをキャッシュに保存
           const responseToCache = response.clone();
           caches.open(CACHE_NAME)
             .then(function(cache) {
@@ -75,12 +120,14 @@ self.addEventListener('fetch', function(event) {
             });
           
           return response;
-        }).catch(function() {
-          // ネットワークエラーの場合、基本的なHTMLを返す（オフライン対応）
-          if (event.request.destination === 'document') {
-            return caches.match('./index.html');
-          }
         });
       })
   );
+});
+
+// skipWaitingメッセージを受け取ったら即座にアクティブ化
+self.addEventListener('message', function(event) {
+  if (event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
