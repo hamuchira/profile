@@ -570,11 +570,6 @@
             font-weight: 600;
             pointer-events: none;
         }
-        
-        /* ニュースアイテムの非表示 */
-        .news-item-hidden {
-            display: none !important;
-        }
     </style>
 </head>
 <body>
@@ -1030,13 +1025,14 @@
                 const dateStyle = 'color: #8B4F92; font-weight: 600; min-width: 100px; display: inline-block;';
                 const contentStyle = 'color: #333;';
                 
-                // 最初の5件以外は非表示クラスを追加
+                // 最初の5件以外は非表示
+                const displayStyle = index >= 5 ? 'display: none;' : 'display: flex;';
                 const hiddenClass = index >= 5 ? ' news-item-hidden' : '';
                 
                 if (row.url && row.url !== '') {
                     // リンクありの場合
                     html += `
-                        <div class="news-item${hiddenClass}" style="display: flex; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
+                        <div class="news-item${hiddenClass}" style="${displayStyle} gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
                             <span style="${dateStyle}">${row.date}</span>
                             <a href="${row.url}" target="_blank" style="${contentStyle} text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#ff9ec7'" onmouseout="this.style.color='#333'">${row.content} →</a>
                         </div>
@@ -1044,7 +1040,7 @@
                 } else {
                     // リンクなしの場合
                     html += `
-                        <div class="news-item${hiddenClass}" style="display: flex; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
+                        <div class="news-item${hiddenClass}" style="${displayStyle} gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
                             <span style="${dateStyle}">${row.date}</span>
                             <span style="${contentStyle}">${row.content}</span>
                         </div>
