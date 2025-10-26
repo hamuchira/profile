@@ -1,5 +1,5 @@
-// Service Workerのバージョン - 更新するたびにこの番号を変更してください
-const CACHE_VERSION = 'v2.0.0';
+// Service Workerのバージョン - 自動的に日時で管理（編集不要！）
+const CACHE_VERSION = 'v-' + new Date().getTime();
 const CACHE_NAME = 'hamuchira-cache-' + CACHE_VERSION;
 
 // キャッシュするファイルのリスト
@@ -77,15 +77,10 @@ self.addEventListener('fetch', function(event) {
   if (event.request.url.includes('.html') || 
       event.request.url.includes('docs.google.com/spreadsheets')) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, {
+        cache: 'no-store'
+      })
         .then(function(response) {
-          // 成功したらキャッシュも更新
-          if (response && response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then(function(cache) {
-              cache.put(event.request, responseClone);
-            });
-          }
           return response;
         })
         .catch(function() {
