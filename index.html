@@ -385,10 +385,69 @@
             padding: 2rem 0;
         }
         
+        /* グローバルナビゲーション */
+        .global-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 70px;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .global-nav-container {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .global-nav-item {
+            background: linear-gradient(135deg, #ff9ec7, #8B4F92);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(139, 79, 146, 0.2);
+        }
+        
+        .global-nav-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 79, 146, 0.3);
+        }
+        
+        .global-nav-item.active {
+            background: linear-gradient(135deg, #8B4F92, #ff9ec7);
+        }
+        
+        /* 2カラムレイアウト(タブレット以上) */
+        @media (min-width: 769px) {
+            .projects-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
         /* モバイル対応 */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
+            .global-nav {
+                top: 60px;
+            }
+            
+            .global-nav-container {
+                padding: 0.8rem;
+                gap: 0.4rem;
+            }
+            
+            .global-nav-item {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
             }
             
             .hero h1 {
@@ -418,6 +477,83 @@
         .floating {
             animation: float 3s ease-in-out infinite;
         }
+        
+        /* モーダルウィンドウ */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            overflow: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            position: relative;
+            max-width: 95%;
+            max-height: 95%;
+            margin: auto;
+        }
+        
+        .modal-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            line-height: 1;
+        }
+        
+        .modal-close:hover {
+            color: #ff9ec7;
+        }
+        
+        .clickable-thumbnail {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .clickable-thumbnail:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .zoom-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(139, 79, 146, 0.9);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -433,13 +569,20 @@
                 <img src="hamuchira-icon.png" alt="はむチラ">
                 <span>はむチラ</span>
             </a>
-            <ul class="nav-links">
-                <li><a href="#projects">プロジェクト</a></li>
-                <li><a href="#shop">通販</a></li>
-                <li><a href="#sns">SNS</a></li>
-            </ul>
         </nav>
     </header>
+
+    <!-- グローバルナビゲーション -->
+    <nav class="global-nav">
+        <div class="global-nav-container">
+            <a href="#limited" class="global-nav-item">🎉 期間限定</a>
+            <a href="#learn" class="global-nav-item">📚 はむチラとは？</a>
+            <a href="#useful" class="global-nav-item">🐹 飼育お役立ち</a>
+            <a href="#projects" class="global-nav-item">🎮 ハムスターゲーム</a>
+            <a href="#shop" class="global-nav-item">🛍️ 通販</a>
+            <a href="#sns" class="global-nav-item">📱 SNS</a>
+        </div>
+    </nav>
 
     <section class="hero">
         <div class="hero-content">
@@ -456,113 +599,234 @@
         </div>
     </section>
 
-    <section id="projects">
+    <!-- 期間限定セクション -->
+    <section id="limited" style="background: linear-gradient(135deg, #fff5e6 0%, #ffe6f0 100%); padding: 4rem 0;">
         <div class="container">
-            <h2 class="section-title">プロジェクト</h2>
+            <h2 class="section-title" style="color: #ff6b9d;">🎉 期間限定</h2>
             <div class="projects-grid">
-                
-                <!-- YouTube -->
-                <div class="project-card">
+                <div class="project-card" style="border: 3px solid #ff6b9d;">
                     <div class="project-thumbnail" style="
-                        background-image: url('youtube-channel.jpg');
+                        height: 250px;
+                        background-image: url('hamuoff.jpg');
                         background-size: cover;
                         background-position: center;
                     "></div>
                     <div class="project-info">
-                        <h3>🎥 YouTube チャンネル</h3>
-                        <p>ハムスター20匹以上の日常を発信中！可愛い瞬間から面白い行動まで、はむライフの魅力をお届けします。</p>
-                        <a href="https://www.youtube.com/@hamuchira" class="project-link" target="_blank">チャンネルを見る</a>
+                        <h3>🐹 はむオフ会</h3>
+                        <p>はむチラファンが集まる特別なオフ会イベント!みんなで楽しい時間を過ごしましょう!</p>
+                        <a href="https://hamuchira.github.io/off/" class="project-link" target="_blank">詳細を見る</a>
                     </div>
                 </div>
+                
+                <div class="project-card" style="border: 3px solid #ff6b9d;">
+                    <div class="project-thumbnail" style="
+                        height: 250px;
+                        background-image: url('hamumvp.jpg');
+                        background-size: cover;
+                        background-position: center;
+                    "></div>
+                    <div class="project-info">
+                        <h3>🎬 はむチラMVP</h3>
+                        <p>感動のMVP動画集!はむチラたちの輝く瞬間をまとめた特別ムービー!</p>
+                        <a href="https://hamuchira.github.io/mvp_movie/" class="project-link" target="_blank">動画を見る</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- はむチラ語ペディア -->
+    <!-- はむチラとは? -->
+    <section id="learn" style="background: linear-gradient(135deg, #e8f5ff 0%, #f0e6ff 100%); padding: 4rem 0;">
+        <div class="container">
+            <h2 class="section-title" style="color: #6b8fff;">📚 はむチラとは?</h2>
+            <div class="projects-grid">
                 <div class="project-card">
                     <div class="project-thumbnail" style="
+                        height: 250px;
+                        background-image: url('youtube.jpg');
+                        background-size: cover;
+                        background-position: center;
+                    "></div>
+                    <div class="project-info">
+                        <h3>🎬 YouTube</h3>
+                        <p>はむチラたちの日常や面白動画を配信中!登録して最新動画をチェックしよう!</p>
+                        <a href="https://www.youtube.com/@hamster20" class="project-link" target="_blank">チャンネルを見る</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-thumbnail" style="
+                        height: 250px;
                         background-image: url('hamuchira-pedia.jpg');
                         background-size: cover;
                         background-position: center;
                     "></div>
                     <div class="project-info">
-                        <h3>📚 はむチラ語ペディア</h3>
-                        <p>ハムスター用語や知識をまとめた辞典サイト。初心者から上級者まで役立つ情報が満載です。</p>
-                        <a href="https://hamuchira.github.io/hanuchiragopedia/" class="project-link" target="_blank">サイトを見る</a>
+                        <h3>📕 はむチラ語ぺでぃあ</h3>
+                        <p>はむチラワールドの用語を解説!知れば知るほど楽しめる、はむチラ百科事典!</p>
+                        <a href="https://hamuchira.github.io/hamuchira-pedia/" class="project-link" target="_blank">用語を調べる</a>
                     </div>
                 </div>
-
-                <!-- はむチラGACHA -->
+                
                 <div class="project-card">
-                    <div class="project-thumbnail" style="
-                        background-image: url('hamuchira-gacha.jpg');
+                    <div class="project-thumbnail clickable-thumbnail" style="
+                        height: 250px;
+                        background-image: url('hamuchira-soukan.png');
                         background-size: cover;
                         background-position: center;
-                    "></div>
+                        position: relative;
+                    " onclick="openModal('hamuchira-soukan.png')">
+                        <div class="zoom-hint">🔍 クリックで拡大</div>
+                    </div>
                     <div class="project-info">
-                        <h3>🎰 はむチラGACHA</h3>
-                        <p>ランダムでハムスターに出会えるガチャゲーム！どんな可愛い子に出会えるかお楽しみに。</p>
-                        <a href="https://candid-cranachan-188117.netlify.app/" class="project-link" target="_blank">ガチャを回す</a>
+                        <h3>🐹 はむチラの愉快な仲間たち</h3>
+                        <p>個性豊かなはむチラたちの相関図!誰と誰が兄弟?親子関係は?クリックして大きな画像で確認!</p>
+                        <button onclick="openModal('hamuchira-soukan.png')" class="project-link" style="border: none; cursor: pointer;">相関図を見る</button>
                     </div>
                 </div>
+                
+                <div class="project-card">
+                    <div class="project-thumbnail clickable-thumbnail" style="
+                        height: 250px;
+                        background-image: url('hamuchira-keizu.png');
+                        background-size: cover;
+                        background-position: center;
+                        position: relative;
+                    " onclick="openModal('hamuchira-keizu.png')">
+                        <div class="zoom-hint">🔍 クリックで拡大</div>
+                    </div>
+                    <div class="project-info">
+                        <h3>🌳 はむチラ家系図</h3>
+                        <p>はむチラファミリーの歴史がここに!代々受け継がれる可愛さのDNA。家系図を辿ってみよう!</p>
+                        <button onclick="openModal('hamuchira-keizu.png')" class="project-link" style="border: none; cursor: pointer;">家系図を見る</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- 毛色シミュレーター -->
+    <!-- モーダルウィンドウ -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <img id="modalImage" class="modal-image" src="" alt="拡大画像">
+        </div>
+    </div>
+
+    <!-- ハムスター飼育のお役立ち系 -->
+    <section id="useful" style="background: linear-gradient(135deg, #e8ffe6 0%, #fffacd 100%); padding: 4rem 0;">
+        <div class="container">
+            <h2 class="section-title" style="color: #6fad58;">🐹 ハムスター飼育のお役立ち</h2>
+            <div class="projects-grid">
                 <div class="project-card">
                     <div class="project-thumbnail" style="
-                        background-image: url('color-simulator.jpg');
+                        height: 250px;
+                        background-image: url('keisikisimyu.jpg');
                         background-size: cover;
                         background-position: center;
                     "></div>
                     <div class="project-info">
                         <h3>🎨 毛色シミュレーター</h3>
-                        <p>ハムスターの遺伝と毛色について学べるシミュレーター。繁殖を考えている方におすすめです。</p>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <a href="https://hamuchira.github.io/hamuchira/" class="project-link" target="_blank" style="flex: 1; min-width: 120px; text-align: center;">シミュレーターを使う</a>
-                            <a href="https://pbs.twimg.com/media/Gwieg6ubEAA9tLm?format=jpg&name=4096x4096" target="_blank" style="
-                                flex: 1; min-width: 120px; text-align: center;
-                                background: linear-gradient(135deg, #ff9ec7, #8B4F92);
-                                color: white;
-                                border: none;
-                                border-radius: 50px;
-                                padding: 0.8rem 2rem;
-                                text-decoration: none;
-                                font-weight: 500;
-                                font-size: 1rem;
-                                cursor: pointer;
-                                transition: transform 0.3s ease;
-                                display: inline-flex;
-                                align-items: center;
-                                justify-content: center;
-                            ">毛色一覧を見る</a>
-                        </div>
+                        <p>ハムスターの両親の毛色から、赤ちゃんの毛色をシミュレーション!遺伝の不思議を体験しよう!</p>
+                        <a href="https://hamuchira.github.io/keisiki-shimyu/" class="project-link" target="_blank">シミュレーターを使う</a>
                     </div>
                 </div>
-
-                <!-- 年齢早見表 -->
+                
                 <div class="project-card">
                     <div class="project-thumbnail" style="
-                        background-image: url('age-calculator.jpg');
+                        height: 250px;
+                        background-image: url('haymihyou.jpg');
                         background-size: cover;
                         background-position: center;
                     "></div>
                     <div class="project-info">
                         <h3>📅 年齢早見表</h3>
-                        <p>ハムスターの年齢を人間の年齢に換算できるツール。愛ハムの成長を実感できます。</p>
-                        <a href="https://hamuchira.github.io/hamster-age-calculator/" class="project-link" target="_blank">年齢を調べる</a>
+                        <p>ハムスターの年齢を人間に換算!愛ハムの成長段階を理解して、最適なケアを!</p>
+                        <a href="https://hamuchira.github.io/nenrei-haymihyou/" class="project-link" target="_blank">年齢を調べる</a>
                     </div>
                 </div>
-
-                <!-- はむぴよ -->
+                
                 <div class="project-card">
                     <div class="project-thumbnail" style="
+                        height: 250px;
                         background-image: url('hampiyou.jpg');
                         background-size: cover;
                         background-position: center;
                     "></div>
                     <div class="project-info">
                         <h3>🥚 はむぴよ</h3>
-                        <p>ハムスターの赤ちゃんが生まれる予定日を算出できるアプリ。大切な誕生の瞬間を逃さずキャッチ！</p>
+                        <p>ハムスターの赤ちゃんが生まれる予定日を算出できるアプリ。大切な誕生の瞬間を逃さずキャッチ!</p>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <a href="https://hamuchira.github.io/hello-baby/" class="project-link" target="_blank" style="flex: 1; min-width: 140px; text-align: center;">出産日を調べる</a>
                             <a href="https://hamuchira.github.io/baby-growth-record/" class="project-link" target="_blank" style="flex: 1; min-width: 140px; text-align: center;">成長記録をつける</a>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <div class="container">
+            <h2 class="section-title">🎮 ハムスターゲーム</h2>
+            <div class="projects-grid">
+                <!-- はむチラGACHA -->
+                <div class="project-card">
+                    <div class="project-thumbnail" style="
+                        height: 250px;
+                        background-image: url('gachagacha.jpg');
+                        background-size: cover;
+                        background-position: center;
+                    "></div>
+                    <div class="project-info">
+                        <h3>🎰 はむチラGACHA</h3>
+                        <p>運試し!何が出るかドキドキのガチャゲーム。レアなはむチラに出会えるかも?!</p>
+                        <a href="https://hamuchira.github.io/hamster-gacha/" class="project-link" target="_blank">ガチャを回す</a>
+                    </div>
+                </div>
+
+                <!-- はむケツぽよぽよ -->
+                <div class="project-card">
+                    <div class="project-thumbnail" style="
+                        height: 250px;
+                        background-image: url('hamuketsu-poyo.jpg');
+                        background-size: cover;
+                        background-position: center;
+                    "></div>
+                    <div class="project-info">
+                        <h3>🍑 はむケツぽよぽよ</h3>
+                        <p>可愛いハムスターのおしりをぽよぽよタッチ!癒しとプニプニ感満載のゲーム!</p>
+                        <a href="https://hamuchiranagaya.github.io/ketsu-poyo/" class="project-link" target="_blank">ぽよぽよする</a>
+                    </div>
+                </div>
+
+                <!-- はむケツ神経衰弱 -->
+                <div class="project-card">
+                    <div class="project-thumbnail" style="
+                        height: 250px;
+                        background-image: url('hamuketsu-card.jpg');
+                        background-size: cover;
+                        background-position: center;
+                    "></div>
+                    <div class="project-info">
+                        <h3>🎮 はむケツ神経衰弱</h3>
+                        <p>ハムスターのおしりで神経衰弱!記憶力を試しながら可愛いおしりを楽しもう!</p>
+                        <a href="https://hamuchiranagaya.github.io/hamuketsu-cardgame/" class="project-link" target="_blank">ゲームをする</a>
+                    </div>
+                </div>
+
+                <!-- はむころりん -->
+                <div class="project-card">
+                    <div class="project-thumbnail" style="
+                        height: 250px;
+                        background-image: url('hamukororin.jpg');
+                        background-size: cover;
+                        background-position: center;
+                    "></div>
+                    <div class="project-info">
+                        <h3>🎲 はむころりん</h3>
+                        <p>コロコロ転がるハムスターを操作してゴールを目指そう!シンプルだけど奥深い!</p>
+                        <a href="https://86star.github.io/86-game/" class="project-link" target="_blank">プレイする</a>
                     </div>
                 </div>
 
@@ -621,6 +885,17 @@
         </div>
     </section>
 
+    <section id="news" style="background: linear-gradient(135deg, #fff9e6 0%, #ffe6f9 100%); padding: 4rem 0;">
+        <div class="container">
+            <h2 class="section-title" style="color: #ff9800;">📰 はむチラのあゆみ</h2>
+            <div style="max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                <div id="newsList" style="font-size: 1rem; line-height: 2;">
+                    <p style="text-align: center; color: #999; padding: 2rem;">読み込み中...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer>
         <div class="container">
             <p>&copy; 2025 はむチラ - もっと！はむチラ長屋ch. All rights reserved.</p>
@@ -628,6 +903,113 @@
     </footer>
 
     <script>
+        // モーダル表示機能
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.classList.add('active');
+            modalImg.src = imageSrc;
+            document.body.style.overflow = 'hidden'; // スクロール無効化
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // スクロール有効化
+        }
+        
+        // ESCキーでモーダルを閉じる
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // スプレッドシートからニュースを読み込む
+        function loadNews() {
+            // ここにスプレッドシートのURLを設定してください
+            const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTuw2B7dBg1IQkIgMj6V9vjZy5uUp64CdHJdsYmR2A1QsGxz8tW0warnL95c1Ab26Bg6QsmT3fxLf_T/pub?gid=0&single=true&output=csv';
+            
+            fetch(SPREADSHEET_URL)
+                .then(response => response.text())
+                .then(data => {
+                    const rows = parseCSV(data);
+                    displayNews(rows);
+                })
+                .catch(error => {
+                    console.error('ニュースの読み込みに失敗しました:', error);
+                    document.getElementById('newsList').innerHTML = '<p style="text-align: center; color: #999;">ニュースの読み込みに失敗しました</p>';
+                });
+        }
+        
+        // CSVデータを解析
+        function parseCSV(data) {
+            const lines = data.split('\n');
+            const rows = [];
+            
+            for (let i = 1; i < lines.length; i++) { // 1行目はヘッダーなのでスキップ
+                const line = lines[i].trim();
+                if (line) {
+                    const columns = line.split(',');
+                    if (columns.length >= 2) {
+                        rows.push({
+                            date: columns[0].trim(),
+                            content: columns[1].trim(),
+                            url: columns[2] ? columns[2].trim() : ''
+                        });
+                    }
+                }
+            }
+            
+            return rows;
+        }
+        
+        // ニュースを表示
+        function displayNews(rows) {
+            const newsList = document.getElementById('newsList');
+            
+            if (rows.length === 0) {
+                newsList.innerHTML = '<p style="text-align: center; color: #999;">まだお知らせはありません</p>';
+                return;
+            }
+            
+            // 新しい順に並び替え（逆順にする）
+            rows.reverse();
+            
+            let html = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+            
+            rows.forEach(row => {
+                const dateStyle = 'color: #8B4F92; font-weight: 600; min-width: 100px; display: inline-block;';
+                const contentStyle = 'color: #333;';
+                
+                if (row.url && row.url !== '') {
+                    // リンクありの場合
+                    html += `
+                        <div style="display: flex; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
+                            <span style="${dateStyle}">${row.date}</span>
+                            <a href="${row.url}" target="_blank" style="${contentStyle} text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#ff9ec7'" onmouseout="this.style.color='#333'">${row.content} →</a>
+                        </div>
+                    `;
+                } else {
+                    // リンクなしの場合
+                    html += `
+                        <div style="display: flex; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
+                            <span style="${dateStyle}">${row.date}</span>
+                            <span style="${contentStyle}">${row.content}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            html += '</div>';
+            newsList.innerHTML = html;
+        }
+        
+        // ページ読み込み時にニュースを取得
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNews();
+        });
+        
         // SNSシェア機能
         function shareTwitter() {
             const url = encodeURIComponent(window.location.href);
