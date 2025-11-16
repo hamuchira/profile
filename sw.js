@@ -1,5 +1,5 @@
 // Service Workerのバージョン - 更新時は必ずこの数字を変更してください！
-const CACHE_VERSION = 'v20241115-003';
+const CACHE_VERSION = 'v20241115-005';
 const CACHE_NAME = 'hamuchira-cache-' + CACHE_VERSION;
 
 // キャッシュするファイルのリスト
