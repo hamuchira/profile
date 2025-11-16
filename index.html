@@ -6,7 +6,6 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="version" content="2.0.3">
     <title>はむチラ - ハムスターの可愛い世界</title>
     
     <!-- ファビコン -->
@@ -22,79 +21,40 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B4F92">
     
-    <!-- Service Worker登録 -->
+    <!-- キャッシュ無効化スクリプト -->
     <script>
-        // バージョン管理用
-        const SITE_VERSION = '2.0.3';
-        
+        // 既存のService Workerを全て削除
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                // Service Workerを登録
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registration successful');
-                        
-                        // ページ読み込み時に即座に更新をチェック
-                        registration.update();
-                        
-                        // 新しいService Workerが見つかったら自動的に更新
-                        registration.addEventListener('updatefound', function() {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', function() {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // 新しいコンテンツが利用可能
-                                    console.log('新しいコンテンツが利用可能です');
-                                    // 古いキャッシュをクリア
-                                    if ('caches' in window) {
-                                        caches.keys().then(function(names) {
-                                            names.forEach(function(name) {
-                                                caches.delete(name);
-                                            });
-                                        });
-                                    }
-                                    // 新しいService Workerをアクティブ化
-                                    newWorker.postMessage({ action: 'skipWaiting' });
-                                }
-                            });
-                        });
-                    })
-                    .catch(function(err) {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-                
-                // Service Workerが更新されたらページをリロード
-                let refreshing;
-                navigator.serviceWorker.addEventListener('controllerchange', function() {
-                    if (refreshing) return;
-                    refreshing = true;
-                    window.location.reload();
-                });
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                    console.log('Service Worker unregistered');
+                }
             });
         }
         
-        // バージョンチェックして古いバージョンなら強制リロード
+        // 全てのキャッシュを削除
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                for (let name of names) {
+                    caches.delete(name);
+                    console.log('Cache deleted: ' + name);
+                }
+            });
+        }
+        
+        // ページ読み込み完了後、常に最新版をチェック
         window.addEventListener('load', function() {
-            const storedVersion = localStorage.getItem('siteVersion');
-            if (storedVersion && storedVersion !== SITE_VERSION) {
-                console.log('新しいバージョンを検出: ' + SITE_VERSION);
-                localStorage.setItem('siteVersion', SITE_VERSION);
-                
-                // 古いキャッシュをクリア
+            // 5秒後に自動的にキャッシュをクリア
+            setTimeout(function() {
                 if ('caches' in window) {
                     caches.keys().then(function(names) {
-                        names.forEach(function(name) {
+                        for (let name of names) {
                             caches.delete(name);
-                        });
+                        }
                     });
                 }
-                
-                // 強制リロード
-                setTimeout(function() {
-                    window.location.reload(true);
-                }, 100);
-            } else if (!storedVersion) {
-                localStorage.setItem('siteVersion', SITE_VERSION);
-            }
+            }, 5000);
         });
     </script>
     <style>
@@ -1070,7 +1030,7 @@
                     <div class="project-info">
                         <h3>🎰 はむチラGACHA</h3>
                         <p>運試し!何が出るかドキドキのガチャゲーム。レアなはむチラに出会えるかも?!</p>
-                        <a href="https://hamuchira.github.io/hamster-gacha/" class="project-link" target="_blank">ガチャを回す</a>
+                        <a href="https://candid-cranachan-188117.netlify.app/" class="project-link" target="_blank">ガチャを回す</a>
                     </div>
                 </div>
 
