@@ -1,5 +1,5 @@
 // Service Workerのバージョン - 更新時は必ずこの数字を変更してください！
-const CACHE_VERSION = 'v20241216-001';
+const CACHE_VERSION = 'v20241216-002';
 const CACHE_NAME = 'hamuchira-cache-' + CACHE_VERSION;
 
 // キャッシュするファイルのリスト
@@ -12,8 +12,8 @@ const urlsToCache = [
   './app-icon.png',
   './main-visual.jpg',
   // 画像ファイル
-  './hamuoff.jpg',
-  './hamumvp.jpg',
+  './hamham-sosenkyo.png',
+  './family-tree.png',
   './youtube.jpg',
   './hamuchira-pedia.jpg',
   './hamuchira-soukan.png',
